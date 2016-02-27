@@ -30,7 +30,7 @@ if [ "$texer" = "" ]; then
     exit 1
 fi
 if [ "$texer" != "pdflatex" ] && [ "$texer" != "latex" ]; then
-    echo " ==> ERROR in primal::write_project.sh - the provided 'texer' did not match the acceptable values, pdflatex or latex."
+    echo " ==> ERROR in primal::write_project.sh - the provided 'texer' did not match an acceptable value, pdflatex or latex."
     exit 1
 fi
 

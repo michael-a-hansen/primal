@@ -1,9 +1,39 @@
 #!/bin/bash
 
-if [ $# -ne 0 ] && [ $# -ne 1 ] && [ $# -ne 2 ]; then
-    echo " ==> ERROR in primal::configure_primal.sh - expected 0-2 arguments but received $#."
-    exit 1
-fi
+texshopdir="n"
+profilepath="n"
+defaulttexer="pdflatex"
+
+# parse arguments
+for i in "$@"
+do
+    case $i in
+        --texshop=*)
+        texshopdir="${i#*=}"
+        shift
+    ;;
+        --profile=*)
+        profilepath="${i#*=}"
+        shift
+    ;;
+        --default-texer=*)
+        defaulttexer="${i#*=}"
+        if [ ! "$defaulttexer" = "pdflatex" ] && [ ! "$defaulttexer" = "latex" ]; then
+            echo " ==> ERROR in primal::primal_configure.sh - the provided 'default-texer' did not match an acceptable value, pdflatex or latex."
+            exit 1
+        fi
+        shift
+    ;;
+        *)
+        echo " ==> ERROR in primal::primal_configure.sh - unexpected argument encounted."
+        echo "  - Allowable arguments are:"
+        echo "  --texshop=[]"
+        echo "  --profile=[]"
+        echo "  --default-texer=[]"
+        exit 1
+    ;;
+    esac
+done
 
 if [ -d "configured" ]; then
     rm -R configured
@@ -23,40 +53,39 @@ cp "src/write-project.sh" "configured/write-project.sh"
 globalconfig="configured/primal-global-config"
 touch $globalconfig
 
-executable=$(which pdflatex)
-texdir=$(echo $executable | rev | cut -c 9- | rev)
+pdflatexexecutable=$(which pdflatex)
+texdir=$(echo $pdflatexexecutable | rev | cut -c 9- | rev)
 echo "texdir=$texdir" >> $globalconfig
 
-echo "texer=pdflatex" >> $globalconfig
+echo "texer=$defaulttexer" >> $globalconfig
 echo "pdfinsrc=y" >> $globalconfig
 
-# integrate with texshop if texshop exists - argument 1 is the TeXShop engine directory (e.g., /Users/mike/Library/TeXShop/Engines)
-if [ $# -ne 0 ]; then
-    if [ ! "$1" = "n" ]; then
-        primalengine="$1/primal.engine"
-        if [ -e $primalengine ]; then
-            rm $primalengine
-        fi
-        ln -s "$primalbase/configured/write-project.sh" $primalengine
+# integrate with texshop
+if [ ! "$texshopdir" = "n" ]; then
+    if [ ! -e $texshopdir ]; then
+        echo " ==> ERROR in primal::primal_configure.sh - provided TeXShop engine folder does not exist!"
+        exit 1
     fi
+    primalengine="$texshopdir/primal.engine"
+    if [ -e $primalengine ]; then
+        rm $primalengine
+    fi
+    ln -s "$primalbase/configured/write-project.sh" $primalengine
 fi
 
-# add aliases if specified and not present - to get aliases type the profile path (directory + file) as the second argument
-if [ $# -ne 0 ] && [ $# -ne 1 ]; then
-    if [ ! "$2" = "n" ]; then
-        profile=$2
-        if [ ! -e $primalengine ]; then
-            echo " ==> ERROR in primal::configure_primal.sh - bash profile provided as 2nd argument does not exist!"
-            exit 1
-        fi
-        if ! grep -q "PRIMAL ALIASES" "$profile" ; then
-            echo "" >> $profile
-            echo "" >> $profile
-            echo "#vvvv PRIMAL ALIASES vvvv" >> $profile
-            echo "alias pa='$primalbase/configured/assemble-project.sh' # primal assemble" >> $profile
-            echo "alias pw='$primalbase/configured/write-project.sh' # primal write" >> $profile
-            echo "#^^^^ PRIMAL ALIASES ^^^^" >> $profile
-            echo "" >> $profile
-        fi
+# add aliases
+if [ ! "$profilepath" = "n" ]; then
+    if [ ! -e $profilepath ]; then
+        echo " ==> ERROR in primal::primal_configure.sh - provided profile/aliases does not exist!"
+        exit 1
+    fi
+    if ! grep -q "PRIMAL ALIASES" "$profilepath" ; then
+        echo "" >> $profilepath
+        echo "" >> $profilepath
+        echo "#vvvv PRIMAL ALIASES vvvv" >> $profilepath
+        echo "alias pa='$primalbase/configured/assemble-project.sh' # primal assemble" >> $profilepath
+        echo "alias pw='$primalbase/configured/write-project.sh' # primal write" >> $profilepath
+        echo "#^^^^ PRIMAL ALIASES ^^^^" >> $profilepath
+        echo "" >> $profilepath
     fi
 fi
