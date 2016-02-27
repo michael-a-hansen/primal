@@ -4,6 +4,11 @@ texshopdir="n"
 profilepath="n"
 defaulttexer="pdflatex"
 
+# try to get a default texdir by finding pdflatex on the path
+pdflatexexecutable=$(which pdflatex)
+texdir=$(echo $pdflatexexecutable | rev | cut -c 9- | rev)
+
+
 # parse arguments
 for i in "$@"
 do
@@ -24,12 +29,17 @@ do
         fi
         shift
     ;;
+        --texdir=*)
+        texdir="${i#*=}"
+        shift
+    ;;
         *)
         echo " ==> ERROR in primal::primal_configure.sh - unexpected argument encounted."
         echo "  - Allowable arguments are:"
         echo "  --texshop=[]"
         echo "  --profile=[]"
         echo "  --default-texer=[]"
+        echo "  --texdir=[]"
         exit 1
     ;;
     esac
@@ -52,11 +62,7 @@ cp "src/write-project.sh" "configured/write-project.sh"
 # build the global configuration script
 globalconfig="configured/primal-global-config"
 touch $globalconfig
-
-pdflatexexecutable=$(which pdflatex)
-texdir=$(echo $pdflatexexecutable | rev | cut -c 9- | rev)
 echo "texdir=$texdir" >> $globalconfig
-
 echo "texer=$defaulttexer" >> $globalconfig
 echo "pdfinsrc=y" >> $globalconfig
 

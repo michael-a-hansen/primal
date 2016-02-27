@@ -1,11 +1,34 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then
-    echo " ==> ERROR in primal::assemble_project.sh - expected 1 argument but received $#."
+projectdir="unspecified"
+
+if [ $# -eq 0 ]; then
+    echo " ==> ERROR in primal::assemble_project.sh - Project name unspecified! Use --name=[...] to specify the name of the primal project. Stopping."
     exit 1
 fi
 
-projectdir=$1
+# parse arguments
+for i in "$@"
+do
+    case $i in
+        --name=*)
+        projectdir="${i#*=}"
+        shift
+    ;;
+        *)
+        echo " ==> ERROR in primal::primal_assemble.sh - unexpected argument encounted."
+        echo "  - Allowable arguments are:"
+        echo "  --name=[]"
+        echo "  --"
+        exit 1
+    ;;
+    esac
+done
+
+if [ "$projectdir" = "unspecified" ]; then
+    echo " ==> ERROR in primal::assemble_project.sh - Project name unspecified! Use --name=[...] to specify the name of the primal project. Stopping."
+    exit 1
+fi
 
 if [ -d "$projectdir" ]; then
     echo " ==> ERROR in primal::assemble_project.sh - a directory $projectdir already exists! Stopping."
