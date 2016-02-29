@@ -1,11 +1,7 @@
 #!/bin/bash
 
 projectdir="unspecified"
-
-if [ $# -eq 0 ]; then
-    echo " ==> ERROR in primal::assemble_project.sh - Project name unspecified! Use --name=[...] to specify the name of the primal project. Stopping."
-    exit 1
-fi
+template="blank"
 
 # parse arguments
 for i in "$@"
@@ -15,11 +11,15 @@ do
         projectdir="${i#*=}"
         shift
     ;;
+        --template=*)
+        template="${i#*=}"
+        shift
+    ;;
         *)
         echo " ==> ERROR in primal::primal_assemble.sh - unexpected argument encounted."
         echo "  - Allowable arguments are:"
         echo "  --name=[]"
-        echo "  --"
+        echo "  --template=[]"
         exit 1
     ;;
     esac
@@ -29,6 +29,25 @@ if [ "$projectdir" = "unspecified" ]; then
     echo " ==> ERROR in primal::assemble_project.sh - Project name unspecified! Use --name=[...] to specify the name of the primal project. Stopping."
     exit 1
 fi
+
+templates=("blank" "article" "siam" "combustion-meeting")
+
+isInArray () {
+    local element
+    for element in "${@:2}"; do [[ "$element" == "$1" ]] && return 0; done
+    return 1
+}
+supported=$(isInArray "$template" "${templates[@]}")
+if [ ! supported ]; then
+    echo " ==> ERROR in primal::assemble_project.sh - the specified template is not supported! Stopping."
+    echo "  - Supported templates:"
+    for t in "${templates[@]}"
+    do
+        echo "    - $t"
+    done
+    exit 1
+fi
+
 
 if [ -d "$projectdir" ]; then
     echo " ==> ERROR in primal::assemble_project.sh - a directory $projectdir already exists! Stopping."
@@ -62,6 +81,10 @@ projectconfig="$projectdir/primal-project-config"
 touch $projectconfig
 echo "mainname=$projectdir" >> $projectconfig
 echo "texdir=$texdir" >> $projectconfig
+
+if [ "$template" = "siam" ] && [ "$texer" = "pdflatex" ]; then
+    texer="latex"
+fi
 echo "texer=$texer" >> $projectconfig
 echo "pdfinsrc=y" >> $projectconfig
 
@@ -72,7 +95,20 @@ mkdir "$projectdir/log"
 mkdir "$projectdir/tmp"
 
 # add templates
-touch "$projectdir/src/$projectdir.tex"
+if [ "$template" = "blank" ]; then
+    touch "$projectdir/src/$projectdir.tex"
+else
+    cp "$primalbase/templates/$template/"* "$projectdir/src"
+    mv "$projectdir/src/main.tex" "$projectdir/src/$projectdir.tex"
+fi
+
 
 # done
 echo "- Project assembled in $projectdir"
+
+
+
+
+
+
+
