@@ -30,25 +30,6 @@ if [ "$projectdir" = "unspecified" ]; then
     exit 1
 fi
 
-templates=("blank" "article" "siam" "combustion-meeting")
-
-isInArray () {
-    local element
-    for element in "${@:2}"; do [[ "$element" == "$1" ]] && return 0; done
-    return 1
-}
-supported=$(isInArray "$template" "${templates[@]}")
-if [ ! supported ]; then
-    echo " ==> ERROR in primal::assemble_project.sh - the specified template is not supported! Stopping."
-    echo "  - Supported templates:"
-    for t in "${templates[@]}"
-    do
-        echo "    - $t"
-    done
-    exit 1
-fi
-
-
 if [ -d "$projectdir" ]; then
     echo " ==> ERROR in primal::assemble_project.sh - a directory $projectdir already exists! Stopping."
     exit 1
@@ -57,6 +38,24 @@ fi
 mkdir $projectdir
 
 primalbase="configureprimalbasehere" # configuration sets this variable
+
+templates=($(ls "$primalbase/templates"))
+
+isInArray () {
+local element
+for element in "${@:2}"; do [[ "$element" == "$1" ]] && return 0; done
+return 1
+}
+supported=$(isInArray "$template" "${templates[@]}")
+if [ ! supported ] || [ ! "$template" = "blank" ]; then
+    echo " ==> ERROR in primal::assemble_project.sh - the specified template is not supported! Stopping."
+    echo "  - Supported templates:"
+    for t in "${templates[@]}"
+    do
+        echo "    - $t"
+    done
+    exit 1
+fi
 
 # parse global config and build project config
 globalconfig="$primalbase/configured/primal-global-config"
