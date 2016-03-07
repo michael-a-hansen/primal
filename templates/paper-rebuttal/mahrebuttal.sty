@@ -1,0 +1,65 @@
+%% mahrebuttal - a LaTeX package for paper review/rebuttal
+% Mike Hansen
+% March, 2015
+
+
+%
+% This package has one option: the color of the author (response) text.
+% If this is not set when using the package, the default author text color is Indigo
+%
+% For example, \usepackage[authortextcolor=Indigo]{mahrebuttal}
+%
+
+
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{mahrebuttal}[03/30/2015 mahrebuttal package]
+\RequirePackage{titlesec}
+\RequirePackage{kvoptions}
+\RequirePackage[usenames,dvipsnames,svgnames]{xcolor}
+\RequirePackage{ifthen}
+
+
+\SetupKeyvalOptions{
+ family=OPTS,
+ prefix=OPTS@
+}
+
+\DeclareStringOption[Indigo]{authortextcolor}[Indigo]
+
+\ProcessKeyvalOptions*
+
+\titleformat{\section}[block]
+  {\fontsize{12}{15}\bfseries\sffamily\filcenter}
+  {}
+  {1em}
+  {\MakeUppercase}
+\titleformat{\subsection}[block]
+  {\fontsize{12}{15}\bfseries\sffamily}
+  {}
+  {1em}
+  {}
+
+\newcommand{\styledthesection}[1]
+{
+  \ifthenelse{\equal{\thesection}{0}}{CQ}{R\thesection}
+}
+
+\newcounter{critique}[section]
+\newenvironment{reviewers}[1][]{
+  \refstepcounter{critique}
+  \par\medskip\noindent
+  \textbf{\styledthesection{}\hspace{-4pt}.\thecritique. #1}
+  \rmfamily}
+{\medskip}
+   
+\newenvironment{authors}[1][]{
+  \color{\OPTS@authortextcolor}
+  \medskip 
+  \sffamily #1}
+{\medskip}
+
+\newcommand{\category}{\section*}
+\newcommand{\commonissue}{\subsection*}
+\newcommand{\nextreviewer}{\section{Reviewer \thesection}}
+
+
