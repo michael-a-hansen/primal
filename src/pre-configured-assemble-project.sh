@@ -2,6 +2,14 @@
 
 projectdir="unspecified"
 template="blank"
+help="noshow"
+
+displayArgs () {
+echo "  - Supported arguments:"
+echo "    --help        : display arguments and templates"
+echo "    --name=[]     : set project name - REQUIRED to make a project"
+echo "    --template=[] : choose a project template - in absence a blank tex file is created in project/src"
+}
 
 # parse arguments
 for i in "$@"
@@ -10,20 +18,37 @@ do
         --name=*)
         projectdir="${i#*=}"
         shift
-    ;;
+;;
         --template=*)
         template="${i#*=}"
         shift
-    ;;
+;;
+        --help*)
+        help="show"
+        shift
+;;
         *)
         echo " ==> ERROR in primal::primal_assemble.sh - unexpected argument encounted."
-        echo "  - Allowable arguments are:"
-        echo "  --name=[]"
-        echo "  --template=[]"
+        displayArgs
         exit 1
-    ;;
+;;
     esac
 done
+
+primalbase="configureprimalbasehere" # configuration sets this variable
+
+templates=($(ls "$primalbase/templates"))
+
+if [ "$help" = "show" ]; then
+    displayArgs
+    echo ""
+    echo "  - Supported templates:"
+    for t in "${templates[@]}"
+    do
+        echo "    - $t"
+    done
+    exit 1
+fi
 
 if [ "$projectdir" = "unspecified" ]; then
     echo " ==> ERROR in primal::assemble_project.sh - Project name unspecified! Use --name=[...] to specify the name of the primal project. Stopping."
@@ -37,14 +62,10 @@ fi
 
 mkdir $projectdir
 
-primalbase="configureprimalbasehere" # configuration sets this variable
-
-templates=($(ls "$primalbase/templates"))
-
 isInArray () {
-local element
-for element in "${@:2}"; do [[ "$element" == "$1" ]] && return 0; done
-return 1
+    local element
+    for element in "${@:2}"; do [[ "$element" == "$1" ]] && return 0; done
+    return 1
 }
 supported=$(isInArray "$template" "${templates[@]}")
 if [ ! supported ] && [ ! "$template" = "blank" ]; then
