@@ -47,7 +47,7 @@ for element in "${@:2}"; do [[ "$element" == "$1" ]] && return 0; done
 return 1
 }
 supported=$(isInArray "$template" "${templates[@]}")
-if [ ! supported ] || [ ! "$template" = "blank" ]; then
+if [ ! supported ] && [ ! "$template" = "blank" ]; then
     echo " ==> ERROR in primal::assemble_project.sh - the specified template is not supported! Stopping."
     echo "  - Supported templates:"
     for t in "${templates[@]}"
