@@ -63,10 +63,10 @@ indexline="$texdir/makeindex $mainname.nlo -s nomencl.ist -o $mainname.nls"
 bibtexline="find . -name '*.aux' -print0 | xargs -0 -n 1 $texdir/bibtex"
 eval $texline
 eval $indexline
-eval $compileline
+eval $texline
 eval $bibtexline
-eval $compileline
-eval $compileline
+eval $texline
+eval $texline
 
 if [ "$texer" = "latex" ]; then
     dvips "$mainname.dvi"
