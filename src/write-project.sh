@@ -56,6 +56,10 @@ tmpdir="../tmp"
 logdir="../log"
 outdir="../output"
 
+# remove .aux file if it exists in the project src directory
+# this happens if primal is interrupted during a build and the aux file is never moved
+rm *.aux
+
 # build document
 texoptions="-interaction nonstopmode -halt-on-error -file-line-error -shell-escape"
 texline="$texdir/$texer $buildoptions $mainname.tex"
