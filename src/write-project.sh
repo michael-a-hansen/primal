@@ -61,9 +61,17 @@ outdir="../output"
 rm *.aux
 
 # build document
+PATH=$PATH\:$texdir
+
+PATH=$PATH\:"Library/TeX/texbin"
+echo "this is a hack to get primal working for a package not seen in the texdir that primal recognizes"
+
+echo $PATH
+
 texoptions="-interaction nonstopmode -halt-on-error -file-line-error -shell-escape"
 texline="$texdir/$texer $buildoptions $mainname.tex"
-indexline="$texdir/makeindex $mainname.nlo -s nomencl.ist -o $mainname.nls"
+#indexline="$texdir/makeindex $mainname.nlo -s nomencl.ist -o $mainname.nls" # if nomenclature package is used
+indexline="$texdir/makeindex -s $mainname.ist -o $mainname.gls $mainname.glo" # if glossaries package is used
 bibtexline="find . -name '*.aux' -print0 | xargs -0 -n 1 $texdir/bibtex"
 eval $texline
 eval $indexline
@@ -100,7 +108,7 @@ fi
 mv *.log $logdir
 
 # move temporaries
-tmpexts=(aux bbl blg spl toc lot lof nlo ist nls ilg out)
+tmpexts=(aux bbl blg spl toc lot lof nlo ist nls ilg out glo gls acn glsdefs)
 for ext in "${tmpexts[@]}"
 do
     count=`ls -1 *.$ext 2>/dev/null | wc -l`
