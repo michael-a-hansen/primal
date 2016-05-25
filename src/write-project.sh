@@ -14,8 +14,8 @@ pdfinsrc=$(awk -F\= '/^pdfinsrc=/{print $2}' $config)
 
 echo " - Parsing primal project configuration file"
 echo "   -- mainname = $mainname"
-echo "   -- texdir = $texdir"
-echo "   -- texer = $texer"
+echo "   -- texdir   = $texdir"
+echo "   -- texer    = $texer"
 echo "   -- pdfinsrc = $pdfinsrc"
 
 if [ "$mainname" = "" ]; then
@@ -51,27 +51,31 @@ if [ ! -f "$mainname.tex" ]; then
 fi
 
 
-# these directories must be relative to the primal project src directory
+# set some directories, these must be relative to the primal project src directory
 tmpdir="../tmp"
 logdir="../log"
 outdir="../output"
 
-# remove .aux file if it exists in the project src directory
-# this happens if primal is interrupted during a build and the aux file is never moved
-rm *.aux
+# remove any temporary files that remained from an interrupted or failed build
+tmpexts=(aux bbl blg spl toc lot lof nlo ist nls ilg out glo gls acn glsdefs gsyi gsyo rsyi rsyo acn acr alg grk rmn)
+echo "-- begin removing remaining temporaries"
+for ext in "${tmpexts[@]}"
+do
+    count=`ls -1 *.$ext 2>/dev/null | wc -l`
+    echo " -- $count .$ext files found"
+    if [ $count != 0 ]; then
+        echo " -- .$ext files removed"
+        rm *.$ext
+    fi
+done
+echo "-- end removing remaining temporaries"
+
 
 # build document
-PATH=$PATH\:$texdir
-
-PATH=$PATH\:"Library/TeX/texbin"
-echo "this is a hack to get primal working for a package not seen in the texdir that primal recognizes"
-
-echo $PATH
-
 texoptions="-interaction nonstopmode -halt-on-error -file-line-error -shell-escape"
-texline="$texdir/$texer $buildoptions $mainname.tex"
-#indexline="$texdir/makeindex $mainname.nlo -s nomencl.ist -o $mainname.nls" # if nomenclature package is used
-indexline="$texdir/makeindex -s $mainname.ist -o $mainname.gls $mainname.glo" # if glossaries package is used
+texline="$texer $buildoptions $mainname.tex"
+#indexline="$texdir/makeindex $mainname.nlo -s nomencl.ist -o $mainname.nls" # if the nomenclature package is used instead of glossaries
+indexline="makeglossaries $mainname"
 bibtexline="find . -name '*.aux' -print0 | xargs -0 -n 1 $texdir/bibtex"
 eval $texline
 eval $indexline
@@ -107,11 +111,10 @@ fi
 # move log
 mv *.log $logdir
 
-# move temporaries
-tmpexts=(aux bbl blg spl toc lot lof nlo ist nls ilg out glo gls acn glsdefs)
+# move tmp
 for ext in "${tmpexts[@]}"
 do
-    count=`ls -1 *.$ext 2>/dev/null | wc -l`
+   count=`ls -1 *.$ext 2>/dev/null | wc -l`
     if [ $count != 0 ]; then
         mv *.$ext $tmpdir
     fi

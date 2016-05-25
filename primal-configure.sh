@@ -5,6 +5,7 @@ profilepath="n"
 defaulttexer="pdflatex"
 
 # try to get a default texdir by finding pdflatex on the path
+# primal will take whatever you give it with your path settings!
 pdflatexexecutable=$(which pdflatex)
 texdir=$(echo $pdflatexexecutable | rev | cut -c 9- | rev)
 
