@@ -102,7 +102,7 @@ touch $projectconfig
 echo "mainname=$projectdir" >> $projectconfig
 echo "texdir=$texdir" >> $projectconfig
 
-if [ "$template" = "siam" ] && [ "$texer" = "pdflatex" ]; then
+if [ "$template" = "siam" ]; then
     texer="latex"
 fi
 echo "texer=$texer" >> $projectconfig
