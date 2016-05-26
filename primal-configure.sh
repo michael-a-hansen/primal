@@ -59,6 +59,7 @@ cp "src/pre-configured-assemble-project.sh" "configured/assemble-project.sh"
 sed -i .bak "s|configureprimalbasehere|$primalbase|" "configured/assemble-project.sh"
 
 cp "src/write-project.sh" "configured/write-project.sh"
+cp "src/generate-pdf.sh" "configured/generate-pdf.sh"
 
 # build the global configuration script
 globalconfig="configured/primal-global-config"
@@ -66,6 +67,7 @@ touch $globalconfig
 echo "texdir=$texdir" >> $globalconfig
 echo "texer=$defaulttexer" >> $globalconfig
 echo "pdfinsrc=y" >> $globalconfig
+echo "primalbasedir=$primalbase" >> $globalconfig
 
 # integrate with texshop
 if [ ! "$texshopdir" = "n" ]; then

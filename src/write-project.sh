@@ -11,6 +11,7 @@ mainname=$(awk -F\= '/^mainname=/{print $2}' $config)
 texdir=$(awk -F\= '/^texdir=/{print $2}' $config)
 texer=$(awk -F\= '/^texer=/{print $2}' $config)
 pdfinsrc=$(awk -F\= '/^pdfinsrc=/{print $2}' $config)
+primalbasedir=$(awk -F\= '/^primalbasedir=/{print $2}' $config)
 
 echo " - Parsing primal project configuration file"
 echo "   -- mainname = $mainname"
@@ -72,25 +73,7 @@ echo "-- end removing remaining temporaries"
 
 
 # build document
-texoptions="-interaction nonstopmode -halt-on-error -file-line-error -shell-escape"
-texline="$texer $buildoptions $mainname.tex"
-#indexline="$texdir/makeindex $mainname.nlo -s nomencl.ist -o $mainname.nls" # if the nomenclature package is used instead of glossaries
-indexline="makeglossaries $mainname"
-bibtexline="find . -name '*.aux' -print0 | xargs -0 -n 1 $texdir/bibtex"
-eval $texline
-eval $indexline
-eval $texline
-eval $bibtexline
-eval $texline
-eval $texline
-
-if [ "$texer" = "latex" ]; then
-    dvips "$mainname.dvi"
-    ps2pdf "$mainname.ps"
-fi
-
-# handle failure
-
+source "$primalbasedir/configured/generate-pdf.sh" "$mainname" "$texer"
 
 # copy output
 outexts=(ps dvi) # handle pdf separately for integration with frontends (e.g. TeXShop)
