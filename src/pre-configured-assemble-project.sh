@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "--primal: project assembly in progress..."
+echo "-- primal: project assembly in progress..."
 
 projectdir="unspecified"
 template="blank"
@@ -89,7 +89,7 @@ if [ ! supported ] && [ ! "$template" = "blank" ]; then
 fi
 
 # parse global config and build project config
-echo "--primal: parsing global config..."
+echo "-- primal: parsing global config..."
 globalconfig="$primalbase/configured/primal-global-config"
 texdir=$(awk -F\= '/^texdir=/{print $2}' $globalconfig)
 texer=$(awk -F\= '/^texer=/{print $2}' $globalconfig)
@@ -107,11 +107,11 @@ if [ "$texer" != "pdflatex" ] && [ "$texer" != "latex" ]; then
     echo "-- primal: error in assemble_project.sh! the provided 'texer' did not match an acceptable value, pdflatex or latex."
     exit 1
 fi
-echo "--primal: done parsing global config"
+echo "-- primal: done parsing global config"
 
 projectconfig="$projectdir/primal-project-config"
 
-echo "--primal: building local config..."
+echo "-- primal: building local config..."
 touch $projectconfig
 echo "mainname=$projectdir" >> $projectconfig
 echo "texdir=$texdir" >> $projectconfig
@@ -124,7 +124,7 @@ fi
 echo "texer=$texer" >> $projectconfig
 echo "pdfinsrc=y" >> $projectconfig
 echo "tmpexts=aux,bbl,blg,spl,toc,lot,lof,nlo,ist,nls,ilg,out,glo,gls,snm,nav,acn,glsdefs,gsyi,gsyo,rsyi,rsyo,acn,acr,alg,grk,rmn" >> $projectconfig
-echo "--primal: done building local config"
+echo "-- primal: done building local config"
 
 # build project directories
 mkdir "$projectdir/src"
@@ -142,7 +142,7 @@ fi
 
 
 # done
-echo "--primal: project assembled in $projectdir"
+echo "-- primal: project assembled in $projectdir"
 
 
 

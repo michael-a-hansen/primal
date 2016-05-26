@@ -25,7 +25,7 @@ do
         --default-texer=*)
         defaulttexer="${i#*=}"
         if [ ! "$defaulttexer" = "pdflatex" ] && [ ! "$defaulttexer" = "latex" ]; then
-            echo " ==> ERROR in primal::primal_configure.sh - the provided 'default-texer' did not match an acceptable value, pdflatex or latex."
+            echo "-- primal: error in primal_configure.sh! the provided 'default-texer' did not match an acceptable value, pdflatex or latex."
             exit 1
         fi
         shift
@@ -35,7 +35,7 @@ do
         shift
     ;;
         *)
-        echo " ==> ERROR in primal::primal_configure.sh - unexpected argument encounted."
+        echo "-- primal: error in primal_configure.sh! unexpected argument encounted."
         echo "  - Allowable arguments are:"
         echo "  --texshop=[]"
         echo "  --profile=[]"
@@ -73,7 +73,7 @@ echo "primalbasedir=$primalbase" >> $globalconfig
 # integrate with texshop
 if [ ! "$texshopdir" = "n" ]; then
     if [ ! -e $texshopdir ]; then
-        echo " ==> ERROR in primal::primal_configure.sh - provided TeXShop engine folder does not exist!"
+        echo "-- primal: error in primal_configure.sh! provided TeXShop engine folder does not exist!"
         exit 1
     fi
     primalengine="$texshopdir/primal.engine"
@@ -83,10 +83,23 @@ if [ ! "$texshopdir" = "n" ]; then
     ln -s "$primalbase/configured/write-project.sh" $primalengine
 fi
 
+# configure tests
+testdir="test"
+if [ -d "$testdir" ]; then
+    rm -R $testdir
+fi
+mkdir $testdir
+testconfig="$testdir/primal-config"
+touch $testconfig
+echo "texdir=$texdir" >> $testconfig
+echo "primalbasedir=$primalbase" >> $testconfig
+cp "src/test.sh" $testdir
+cp "src/runtests.sh" $testdir
+
 # add aliases
 if [ ! "$profilepath" = "n" ]; then
     if [ ! -e $profilepath ]; then
-        echo " ==> ERROR in primal::primal_configure.sh - provided profile/aliases does not exist!"
+        echo "-- primal: error in primal_configure.sh! provided profile/aliases file does not exist!"
         exit 1
     fi
     if ! grep -q "PRIMAL ALIASES" "$profilepath" ; then
@@ -99,3 +112,4 @@ if [ ! "$profilepath" = "n" ]; then
         echo "" >> $profilepath
     fi
 fi
+

@@ -60,7 +60,7 @@ else
         count=`ls -1 *.$ext 2>/dev/null | wc -l`
         echo " -- primal: $count .$ext files found"
         if [ $count != 0 ]; then
-            echo " -- primal: .$ext files removed"
+            echo "-- primal: .$ext files removed"
             rm *.$ext
         fi
     done
