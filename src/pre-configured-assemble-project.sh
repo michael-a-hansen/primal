@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "--primal: project assembly in progress..."
+
 projectdir="unspecified"
 template="blank"
 help="noshow"
@@ -28,7 +30,7 @@ do
         shift
 ;;
         *)
-        echo " ==> ERROR in primal::primal_assemble.sh - unexpected argument encounted."
+        echo "-- primal: error in assemble_project.sh! unexpected argument encounted."
         displayArgs
         exit 1
 ;;
@@ -51,13 +53,21 @@ if [ "$help" = "show" ]; then
 fi
 
 if [ "$projectdir" = "unspecified" ]; then
-    echo " ==> ERROR in primal::assemble_project.sh - Project name unspecified! Use --name=[...] to specify the name of the primal project. Stopping."
+    echo "-- primal: error in assemble_project.sh! Project name unspecified! Use --name=[...] to specify the name of the primal project. Stopping."
     exit 1
 fi
 
 if [ -d "$projectdir" ]; then
-    echo " ==> ERROR in primal::assemble_project.sh - a directory $projectdir already exists! Stopping."
-    exit 1
+    replace="n"
+    echo "-- primal: error in assemble_project.sh! a directory $projectdir already exists! Enter yes to replace the project, any other key to stop."
+    read replace
+    if [ "$replace" = "yes" ]; then
+        rm -R "$projectdir"
+        echo "primal: deleted $projectdir"
+    else
+        echo "primal: $projectdir exists and you did not say to overwrite - stopping."
+        exit 1
+    fi
 fi
 
 mkdir $projectdir
@@ -69,7 +79,7 @@ isInArray () {
 }
 supported=$(isInArray "$template" "${templates[@]}")
 if [ ! supported ] && [ ! "$template" = "blank" ]; then
-    echo " ==> ERROR in primal::assemble_project.sh - the specified template is not supported! Stopping."
+    echo "-- primal: error in assemble_project.sh! the specified template is not supported! Stopping."
     echo "  - Supported templates:"
     for t in "${templates[@]}"
     do
@@ -79,26 +89,29 @@ if [ ! supported ] && [ ! "$template" = "blank" ]; then
 fi
 
 # parse global config and build project config
+echo "--primal: parsing global config..."
 globalconfig="$primalbase/configured/primal-global-config"
 texdir=$(awk -F\= '/^texdir=/{print $2}' $globalconfig)
 texer=$(awk -F\= '/^texer=/{print $2}' $globalconfig)
-primalbasedir=$(awk -F\= '/^primalbasedir=/{print $2}' $config)
+primalbasedir=$(awk -F\= '/^primalbasedir=/{print $2}' $globalconfig)
 
 if [ "$texdir" = "" ]; then
-    echo " ==> ERROR in primal::assemble_project.sh - texdir was not provided in the project configuration."
+    echo "-- primal: error in assemble_project.sh! texdir was not provided in the project configuration."
     exit 1
 fi
 if [ "$texer" = "" ]; then
-    echo " ==> ERROR in primal::assemble_project.sh - texer was not provided in the project configuration."
+    echo "-- primal: error in assemble_project.sh! texer was not provided in the project configuration."
     exit 1
 fi
 if [ "$texer" != "pdflatex" ] && [ "$texer" != "latex" ]; then
-    echo " ==> ERROR in primal::write_project.sh - the provided 'texer' did not match an acceptable value, pdflatex or latex."
+    echo "-- primal: error in assemble_project.sh! the provided 'texer' did not match an acceptable value, pdflatex or latex."
     exit 1
 fi
+echo "--primal: done parsing global config"
 
 projectconfig="$projectdir/primal-project-config"
 
+echo "--primal: building local config..."
 touch $projectconfig
 echo "mainname=$projectdir" >> $projectconfig
 echo "texdir=$texdir" >> $projectconfig
@@ -106,9 +119,12 @@ echo "primalbasedir=$primalbasedir" >> $projectconfig
 
 if [ "$template" = "siam" ]; then
     texer="latex"
+    echo "-- primal: specified template ($template) requires latex->dvi->pdf instead of pdflatex - builder is set to latex->dvi->pdf"
 fi
 echo "texer=$texer" >> $projectconfig
 echo "pdfinsrc=y" >> $projectconfig
+echo "tmpexts=aux,bbl,blg,spl,toc,lot,lof,nlo,ist,nls,ilg,out,glo,gls,snm,nav,acn,glsdefs,gsyi,gsyo,rsyi,rsyo,acn,acr,alg,grk,rmn" >> $projectconfig
+echo "--primal: done building local config"
 
 # build project directories
 mkdir "$projectdir/src"
@@ -126,7 +142,7 @@ fi
 
 
 # done
-echo "- Project assembled in $projectdir"
+echo "--primal: project assembled in $projectdir"
 
 
 

@@ -12,6 +12,7 @@ texdir=$(awk -F\= '/^texdir=/{print $2}' $config)
 texer=$(awk -F\= '/^texer=/{print $2}' $config)
 pdfinsrc=$(awk -F\= '/^pdfinsrc=/{print $2}' $config)
 primalbasedir=$(awk -F\= '/^primalbasedir=/{print $2}' $config)
+tmpextsstr=$(awk -F\= '/^tmpexts=/{print $2}' $config)
 
 echo "-- primal: parsing project configuration file"
 echo "   -- mainname      = $mainname"
@@ -68,4 +69,8 @@ outdir="../output"
 source "$primalbasedir/configured/generate-pdf.sh" "$mainname" "$texer"
 
 # cleanup
-source "$primalbasedir/configured/cleanup.sh" "$mainname" "$pdfinsrc" "$outdir" "$logdir" "$tmpdir"
+
+# get the extensions of temporaries
+IFS=',' read -r -a tmpexts <<< "$tmpextsstr"
+
+source "$primalbasedir/configured/cleanup.sh" "$mainname" "$pdfinsrc" "$outdir" "$logdir" "$tmpdir" "$tmpexts"

@@ -5,13 +5,11 @@ pdfinsrc=$2
 outdir=$3
 logdir=$4
 tmpdir=$5
-preremoval=$6
+tmpexts=$6
+preremoval=$7
 if [ -z $preremoval ]; then
     preremoval=0
 fi
-
-# get the extensions of temporaries
-tmpexts=(aux bbl blg spl toc lot lof nlo ist nls ilg out glo gls snm nav acn glsdefs gsyi gsyo rsyi rsyo acn acr alg grk rmn)
 
 if [ "$preremoval" = "0" ] ; then
 
