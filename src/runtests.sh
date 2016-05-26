@@ -6,14 +6,14 @@
 #
 
 
-config="primal-config"
+config="primal-global-config"
 primalbasedir=$(awk -F\= '/^primalbasedir=/{print $2}' $config)
 
 configureddir="$primalbasedir/configured"
 assemble="$configureddir/assemble-project.sh"
 write="$configureddir/write-project.sh"
 
-name="test"
+name="primal-test-project"
 
 templates=($(ls "$primalbasedir/templates"))
 
@@ -24,12 +24,9 @@ failing=""
 for t in "${templates[@]}"
 do
     total=$((total+1))
-    if source test.sh $t ; then
-        if [ -e "$name/output/$name.pdf" ]; then
-            pass=$((pass+1))
-        else
-            failing="$failing $t"
-        fi
+    source ".test.sh" "$t"
+    if [ -e "$name/output/$name.pdf" ]; then
+        pass=$((pass+1))
     else
         failing="$failing $t"
     fi

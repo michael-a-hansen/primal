@@ -17,12 +17,7 @@ fi
 
 echo "-- primal: compilation in progress..."
 
-#texoptions="-interaction=nonstopmode -halt-on-error -file-line-error -shell-escape"
-#texoptins="-halt-on-error -file-line-error -shell-escape"
-#texoptions="-halt-on-error -file-line-error -shell-escape"
-#texline="$texer $buildoptions $mainname.tex"
 texline="$texer -halt-on-error -file-line-error -shell-escape $mainname.tex"
-#indexline="$texdir/makeindex $mainname.nlo -s nomencl.ist -o $mainname.nls" # if the nomenclature package is used instead of glossaries
 indexline="makeglossaries $mainname"
 bibtexline="find . -name '*.aux' -print0 | xargs -0 -n 1 $texdir/bibtex"
 eval $texline

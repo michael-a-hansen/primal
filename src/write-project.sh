@@ -14,6 +14,8 @@ pdfinsrc=$(awk -F\= '/^pdfinsrc=/{print $2}' $config)
 primalbasedir=$(awk -F\= '/^primalbasedir=/{print $2}' $config)
 tmpextsstr=$(awk -F\= '/^tmpexts=/{print $2}' $config)
 
+IFS=',' read -r -a tmpexts <<< "$tmpextsstr"
+
 echo "-- primal: parsing project configuration file"
 echo "   -- mainname      = $mainname"
 echo "   -- texdir        = $texdir"
@@ -65,12 +67,32 @@ tmpdir="../tmp"
 logdir="../log"
 outdir="../output"
 
+# clean up anything remaining from an incomplete build
+source "$primalbasedir/configured/cleanup.sh" "$mainname" "$pdfinsrc" "$outdir" "$logdir" "$tmpdir" "$tmpexts" 1
+
 # build document
 source "$primalbasedir/configured/generate-pdf.sh" "$mainname" "$texer"
 
+failed="0"
+if grep --quiet "Fatal error occurred" "$mainname.log" ; then
+    failed="1"
+    echo "################################"
+    echo ""
+    echo ""
+    echo "-- primal: something went wrong in compilation!!!"
+    echo ""
+    echo ""
+    echo "from the latex log:"
+    echo ""
+    grep "Fatal error occurred" "$mainname.log"
+    grep "$mainname.tex" "$mainname.log"
+    echo ""
+    echo ""
+    echo "################################"
+fi
+
 # cleanup
+if [ "$failed" = "0" ]; then
+    source "$primalbasedir/configured/cleanup.sh" "$mainname" "$pdfinsrc" "$outdir" "$logdir" "$tmpdir" "$tmpexts"
+fi
 
-# get the extensions of temporaries
-IFS=',' read -r -a tmpexts <<< "$tmpextsstr"
-
-source "$primalbasedir/configured/cleanup.sh" "$mainname" "$pdfinsrc" "$outdir" "$logdir" "$tmpdir" "$tmpexts"

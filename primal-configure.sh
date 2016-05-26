@@ -47,10 +47,10 @@ do
 done
 
 if [ -d "configured" ]; then
-    rm -R configured
+    find "configured/" -mindepth 1 -delete
+else
+    mkdir configured
 fi
-
-mkdir configured
 
 # configure assemble script
 primalbase=$(pwd)
@@ -84,17 +84,8 @@ if [ ! "$texshopdir" = "n" ]; then
 fi
 
 # configure tests
-testdir="test"
-if [ -d "$testdir" ]; then
-    rm -R $testdir
-fi
-mkdir $testdir
-testconfig="$testdir/primal-config"
-touch $testconfig
-echo "texdir=$texdir" >> $testconfig
-echo "primalbasedir=$primalbase" >> $testconfig
-cp "src/test.sh" $testdir
-cp "src/runtests.sh" $testdir
+cp "src/.test.sh" "configured/.test.sh"
+cp "src/runtests.sh" "configured/runtests.sh"
 
 # add aliases
 if [ ! "$profilepath" = "n" ]; then
