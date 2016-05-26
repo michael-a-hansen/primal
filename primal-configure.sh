@@ -60,6 +60,7 @@ sed -i .bak "s|configureprimalbasehere|$primalbase|" "configured/assemble-projec
 
 cp "src/write-project.sh" "configured/write-project.sh"
 cp "src/generate-pdf.sh" "configured/generate-pdf.sh"
+cp "src/cleanup.sh" "configured/cleanup.sh"
 
 # build the global configuration script
 globalconfig="configured/primal-global-config"

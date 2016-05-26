@@ -4,16 +4,18 @@ mainname=$1 # arg 1 is the name of the main tex file, no .extension
 texer=$2    # arg 2 is the program to be used (default pdflatex)
 
 if [ -z "$mainname" ]; then
-    echo "error! you must provide the name of the main tex file as the first argument (no .extension)"
+    echo "-- primal: error in generate-pdf.sh! you must provide the name of the main tex file as the first argument (no .extension)"
     echo "build stopped"
     exit 1
 fi
 
 if [ -z "$texer" ]; then
-    echo "you provided no second argument, so pdflatex (path below) will be used to compile"
+    echo "-- primal: you provided no second argument, so pdflatex (path below) will be used to compile"
     which pdflatex
     texer="pdflatex"
 fi
+
+echo "-- primal: compilation in progress..."
 
 texoptions="-interaction nonstopmode -halt-on-error -file-line-error -shell-escape"
 texline="$texer $buildoptions $mainname.tex"
@@ -32,4 +34,4 @@ if [ "$texer" = "latex" ]; then
     ps2pdf "$mainname.ps"
 fi
 
-echo "compilation finished!"
+echo "-- primal: compilation finished!"
