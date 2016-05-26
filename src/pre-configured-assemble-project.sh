@@ -82,6 +82,7 @@ fi
 globalconfig="$primalbase/configured/primal-global-config"
 texdir=$(awk -F\= '/^texdir=/{print $2}' $globalconfig)
 texer=$(awk -F\= '/^texer=/{print $2}' $globalconfig)
+primalbasedir=$(awk -F\= '/^primalbasedir=/{print $2}' $config)
 
 if [ "$texdir" = "" ]; then
     echo " ==> ERROR in primal::assemble_project.sh - texdir was not provided in the project configuration."
@@ -101,6 +102,7 @@ projectconfig="$projectdir/primal-project-config"
 touch $projectconfig
 echo "mainname=$projectdir" >> $projectconfig
 echo "texdir=$texdir" >> $projectconfig
+echo "primalbasedir=$primalbasedir" >> $projectconfig
 
 if [ "$template" = "siam" ]; then
     texer="latex"
