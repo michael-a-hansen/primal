@@ -22,25 +22,11 @@ do
         profilepath="${i#*=}"
         shift
     ;;
-        --default-texer=*)
-        defaulttexer="${i#*=}"
-        if [ ! "$defaulttexer" = "pdflatex" ] && [ ! "$defaulttexer" = "latex" ]; then
-            echo "-- primal: error in primal_configure.sh! the provided 'default-texer' did not match an acceptable value, pdflatex or latex."
-            exit 1
-        fi
-        shift
-    ;;
-        --texdir=*)
-        texdir="${i#*=}"
-        shift
-    ;;
         *)
         echo "-- primal: error in primal_configure.sh! unexpected argument encounted."
         echo "  - Allowable arguments are:"
         echo "  --texshop=[]"
         echo "  --profile=[]"
-        echo "  --default-texer=[]"
-        echo "  --texdir=[]"
         exit 1
     ;;
     esac

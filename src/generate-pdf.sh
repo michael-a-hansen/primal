@@ -19,7 +19,7 @@ echo "-- primal: compilation in progress..."
 
 texline="$texer -halt-on-error -file-line-error -shell-escape $mainname.tex"
 indexline="makeglossaries $mainname"
-bibtexline="find . -name '*.aux' -print0 | xargs -0 -n 1 $texdir/bibtex"
+bibtexline="find . -name '*.aux' -print0 | xargs -0 -n 1 bibtex"
 eval $texline
 eval $indexline
 eval $texline
@@ -28,6 +28,8 @@ eval $texline
 eval $texline
 
 if [ "$texer" = "latex" ]; then
+    which dvips
+    which ps2pdf
     dvips "$mainname.dvi"
     ps2pdf "$mainname.ps"
 fi
