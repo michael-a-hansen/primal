@@ -117,7 +117,7 @@ echo "mainname=$projectdir" >> $projectconfig
 echo "texdir=$texdir" >> $projectconfig
 echo "primalbasedir=$primalbasedir" >> $projectconfig
 
-if [ "$template" = "siam" ]; then
+if [ -e "$primalbase/templates/$template/USE_LATEX" ]; then
     texer="latex"
     echo "-- primal: specified template ($template) requires latex->dvi->pdf instead of pdflatex - builder is set to latex->dvi->pdf"
 fi
