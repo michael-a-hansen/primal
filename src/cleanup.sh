@@ -35,7 +35,7 @@ if [ "$preremoval" = "0" ] ; then
 
     # move log
     echo "-- primal: moving log to $logdir..."
-    mv *.log $logdir
+    find . -type f -name "*.log" -exec mv {} "$logdir" \;
     echo "-- primal: done moving log to $logdir"
 
 
@@ -46,8 +46,8 @@ if [ "$preremoval" = "0" ] ; then
         count=`ls -1 *.$ext 2>/dev/null | wc -l`
         echo "-- primal: $count .$ext files found"
         if [ $count != 0 ]; then
+            find . -type f -name "*.$ext" -exec mv {} "$tmpdir" \;
             echo " -- primal: .$ext files moved to $tmpdir"
-            mv *.$ext $tmpdir
         fi
     done
     echo "-- primal: done moving temporaries to $tmpdir"
@@ -61,7 +61,7 @@ else
         echo " -- primal: $count .$ext files found"
         if [ $count != 0 ]; then
             echo "-- primal: .$ext files removed"
-            rm *.$ext
+            find . -type f -name "$.$ext" -exec rm {} \;
         fi
     done
     echo "-- primal: done purging temporaries"
