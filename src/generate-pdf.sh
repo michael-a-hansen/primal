@@ -17,7 +17,7 @@ fi
 
 echo "-- primal: compilation in progress..."
 
-texline="$texer -halt-on-error -file-line-error -shell-escape $mainname.tex"
+texline="$texer -halt-on-error -file-line-error -shell-escape --synctex=1 $mainname.tex"
 indexline="makeglossaries $mainname"
 bibtexline="find . -name '*.aux' -print0 | xargs -0 -n 1 bibtex"
 eval $texline
